@@ -59,6 +59,7 @@ price tag.*
 | `commands/setup-worker.md` | `/model-orchestration:setup-worker` — guided setup |
 | `commands/delegate.md` | `/model-orchestration:delegate` — explicit dispatch + audit loop |
 | `hooks/session-start.sh` | Makes delegation the default: injects rules + worker inventory each session |
+| `agents/worker-dispatch.md` | Bridge agent so Workflow scripts and the Agent tool can fan tasks out to workers (`agentType: 'model-orchestration:worker-dispatch'`) |
 | `skills/.../templates/delegation-rules.md` | Drop-in CLAUDE.md section to make delegation a standing behavior |
 
 ## Requirements

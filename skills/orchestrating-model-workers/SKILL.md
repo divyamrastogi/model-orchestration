@@ -73,6 +73,27 @@ Return a one-paragraph summary with file paths, not full diffs." \
 - To install these rules permanently, append `templates/delegation-rules.md`
   (in this skill's directory) to the user's `~/.claude/CLAUDE.md`.
 
+## Workers inside Workflows and subagents
+
+Workflow `agent()` calls and the Agent tool only accept Claude model tiers —
+they cannot route to another provider directly. Bridge with the plugin's
+`worker-dispatch` agent (a thin coordinator that shells out to a worker and
+relays its summary), keeping Claude for the audit stage:
+
+```js
+const results = await pipeline(tasks,
+  t => agent(`Worker: glm. Task spec: ${t.spec}`,
+             {agentType: 'model-orchestration:worker-dispatch', effort: 'low',
+              phase: 'Implement'}),
+  (r, t) => agent(`Audit this result against the criteria: ${t.criteria}\n${r}`,
+                  {phase: 'Audit'})   // revision gate stays on Claude
+)
+```
+
+Keep fan-out modest (~4–8 concurrent dispatches): each one is a real `claude`
+process on your machine, and the provider's rate limits stack under the
+workflow's own concurrency cap.
+
 ## Critical traps (verbatim failures without this setup)
 
 | Symptom | Cause | Fix |
