@@ -29,9 +29,13 @@ curl -s -o /dev/null -w '%{http_code}\n' <base-url>/v1/messages -X POST
 
 Run the bundled script (every command prints its next steps; `create` refuses
 to overwrite an existing worker — on "already exists", use `list` to inspect
-and `remove` to rebuild, don't retry blindly):
+and `remove` to rebuild, don't retry blindly). Prefer a preset — run
+`setup-worker.sh presets` for known providers, and when the user hasn't named
+one, offer them the preset list as a choice instead of asking for URLs:
 
 ```bash
+"${CLAUDE_PLUGIN_ROOT}/scripts/setup-worker.sh" create glm --provider zai
+# or fully manual, for any Anthropic-compatible endpoint:
 "${CLAUDE_PLUGIN_ROOT}/scripts/setup-worker.sh" create glm \
   --base-url https://api.z.ai/api/anthropic \
   --sonnet glm-5.2 --opus glm-5.2 --haiku glm-4.7
@@ -85,7 +89,9 @@ Return a one-paragraph summary with file paths, not full diffs." \
 
 | Action | Command |
 |---|---|
-| Create worker | `setup-worker.sh create <name> --base-url <url> [--sonnet/--opus/--haiku <model>]` |
+| List provider presets | `setup-worker.sh presets` |
+| Create worker (preset) | `setup-worker.sh create <name> --provider <id>` |
+| Create worker (manual) | `setup-worker.sh create <name> --base-url <url> [--sonnet/--opus/--haiku <model>]` |
 | Add key (stdin) | `printf '%s' "$KEY" \| setup-worker.sh set-key <name>` |
 | Verify + activate | `setup-worker.sh finalize <name>` |
 | List / remove | `setup-worker.sh list` / `setup-worker.sh remove <name>` |

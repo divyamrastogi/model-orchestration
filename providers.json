@@ -1,0 +1,41 @@
+{
+  "_comment": "Provider presets. Endpoints/models verified 2026-07; if a preset fails, check the provider's docs — names drift. Flags passed to 'create' override preset values.",
+  "providers": {
+    "zai": {
+      "label": "z.ai GLM (Coding Plan)",
+      "base_url": "https://api.z.ai/api/anthropic",
+      "sonnet": "glm-5.2",
+      "opus": "glm-5.2",
+      "haiku": "glm-4.7",
+      "key_url": "https://z.ai/manage-apikey/apikey-list",
+      "notes": "Flat-rate coding plan; key format is id.secret — copy both halves"
+    },
+    "kimi": {
+      "label": "Moonshot Kimi",
+      "base_url": "https://api.moonshot.ai/anthropic",
+      "sonnet": "kimi-k2.5",
+      "opus": "kimi-k2.5",
+      "haiku": "kimi-k2.5",
+      "key_url": "https://platform.moonshot.ai/console/api-keys",
+      "notes": "1T-param MoE, strong long-context"
+    },
+    "minimax": {
+      "label": "MiniMax",
+      "base_url": "https://api.minimax.io/anthropic",
+      "sonnet": "minimax-m2.7",
+      "opus": "minimax-m2.7",
+      "haiku": "minimax-m2.7",
+      "key_url": "https://platform.minimax.io/user-center/basic-information/interface-key",
+      "notes": ""
+    },
+    "deepseek": {
+      "label": "DeepSeek",
+      "base_url": "https://api.deepseek.com/anthropic",
+      "sonnet": "deepseek-chat",
+      "opus": "deepseek-reasoner",
+      "haiku": "deepseek-chat",
+      "key_url": "https://platform.deepseek.com/api_keys",
+      "notes": "opus tier mapped to the reasoner model"
+    }
+  }
+}

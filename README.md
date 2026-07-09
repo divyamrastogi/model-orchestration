@@ -22,12 +22,16 @@ settings, and history are never touched.
 ## Quick start
 
 ```
-/model-orchestration:setup-worker glm z.ai
+/model-orchestration:setup-worker
 ```
 
-Claude creates the worker and tells you where to put your API key (you add it
-yourself — keys are never passed on the command line or requested in chat),
-then verifies the worker with a live smoke test.
+That's the whole command: Claude shows you a picker of known providers —
+z.ai GLM, Moonshot Kimi, MiniMax, DeepSeek, or any custom Anthropic-compatible
+endpoint — and configures the ones you select (endpoints and model mappings
+come from bundled presets). The only thing you supply is your API key: Claude
+tells you where to get it and which file to put it in (keys are never passed
+on the command line or requested in chat). A live smoke test confirms each
+worker before it's used.
 
 **That's it — delegation is now the default.** A SessionStart hook injects the
 orchestration rules and your worker inventory into every session, so Claude

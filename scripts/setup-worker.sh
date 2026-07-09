@@ -5,6 +5,8 @@
 # ~/.claude-workers/<name>/ with its own settings, auth, and history.
 #
 # Usage:
+#   setup-worker.sh presets               # list known provider presets
+#   setup-worker.sh create <name> --provider <preset> [overrides...]
 #   setup-worker.sh create <name> --base-url <url> [--sonnet <model>] [--opus <model>] [--haiku <model>]
 #   setup-worker.sh set-key <name>        # reads API key from stdin (never a CLI arg)
 #   setup-worker.sh finalize <name>       # seed onboarding + run smoke test
@@ -19,6 +21,7 @@ set -euo pipefail
 
 WORKERS_ROOT="${CLAUDE_WORKERS_ROOT:-$HOME/.claude-workers}"
 PLACEHOLDER="PASTE_YOUR_API_KEY_HERE"
+PROVIDERS_JSON="$(cd "$(dirname "$0")/.." && pwd)/providers.json"
 
 die() { echo "error: $*" >&2; exit 1; }
 
@@ -39,13 +42,37 @@ print(obj)
 PY
 }
 
+preset_field() { # preset_field <provider-id> <field>
+  python3 - "$PROVIDERS_JSON" "$1" "$2" <<'PY'
+import json, sys
+providers = json.load(open(sys.argv[1]))["providers"]
+if sys.argv[2] not in providers:
+    print(f"unknown provider '{sys.argv[2]}'; available: {', '.join(providers)}", file=sys.stderr)
+    sys.exit(1)
+print(providers[sys.argv[2]].get(sys.argv[3], ""))
+PY
+}
+
+cmd_presets() {
+  python3 - "$PROVIDERS_JSON" <<'PY'
+import json, sys
+data = json.load(open(sys.argv[1]))
+print(f"{'id':<10} {'label':<26} {'endpoint':<42} get key at")
+for pid, p in data["providers"].items():
+    print(f"{pid:<10} {p['label']:<26} {p['base_url']:<42} {p['key_url']}")
+    if p.get("notes"):
+        print(f"{'':<10} note: {p['notes']}")
+PY
+}
+
 cmd_create() {
-  local name="" base_url="" sonnet="" opus="" haiku=""
+  local name="" base_url="" sonnet="" opus="" haiku="" provider=""
   name="${1:-}"; shift || true
-  [ -n "$name" ] || die "usage: setup-worker.sh create <name> --base-url <url> [--sonnet m] [--opus m] [--haiku m]"
+  [ -n "$name" ] || die "usage: setup-worker.sh create <name> --provider <preset> | --base-url <url> [--sonnet m] [--opus m] [--haiku m]"
   echo "$name" | grep -Eq '^[a-z0-9][a-z0-9-]*$' || die "worker name must be lowercase letters, digits, hyphens"
   while [ $# -gt 0 ]; do
     case "$1" in
+      --provider) provider="$2"; shift 2 ;;
       --base-url) base_url="$2"; shift 2 ;;
       --sonnet)   sonnet="$2";   shift 2 ;;
       --opus)     opus="$2";     shift 2 ;;
@@ -53,7 +80,14 @@ cmd_create() {
       *) die "unknown option: $1" ;;
     esac
   done
-  [ -n "$base_url" ] || die "--base-url is required (the provider's Anthropic-compatible endpoint)"
+  if [ -n "$provider" ]; then
+    # preset supplies defaults; explicit flags win
+    [ -n "$base_url" ] || base_url="$(preset_field "$provider" base_url)" || exit 1
+    [ -n "$sonnet" ]   || sonnet="$(preset_field "$provider" sonnet)"
+    [ -n "$opus" ]     || opus="$(preset_field "$provider" opus)"
+    [ -n "$haiku" ]    || haiku="$(preset_field "$provider" haiku)"
+  fi
+  [ -n "$base_url" ] || die "--base-url or --provider is required (see: setup-worker.sh presets)"
 
   local dir; dir="$(worker_dir "$name")"
   [ -e "$dir" ] && die "worker '$name' already exists at $dir"
@@ -199,10 +233,11 @@ cmd_remove() {
 }
 
 case "${1:-}" in
+  presets)  shift; cmd_presets "$@" ;;
   create)   shift; cmd_create "$@" ;;
   set-key)  shift; cmd_set_key "$@" ;;
   finalize) shift; cmd_finalize "$@" ;;
   list)     shift; cmd_list "$@" ;;
   remove)   shift; cmd_remove "$@" ;;
-  *) sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
+  *) sed -n '2,18p' "$0" | sed 's/^# \{0,1\}//'; exit 1 ;;
 esac
