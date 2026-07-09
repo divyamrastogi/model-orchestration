@@ -1,6 +1,6 @@
 {
   "name": "model-orchestration",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Manager/worker orchestration for Claude Code: keep your smartest model as the manager and delegate implementation and token-hungry work to isolated headless workers backed by any Anthropic-compatible API (z.ai GLM, Kimi, DeepSeek, LiteLLM proxies, ...).",
   "author": {
     "name": "Divyam Rastogi"

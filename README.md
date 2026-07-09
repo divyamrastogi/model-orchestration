@@ -29,13 +29,19 @@ Claude creates the worker and tells you where to put your API key (you add it
 yourself — keys are never passed on the command line or requested in chat),
 then verifies the worker with a live smoke test.
 
-Then delegate:
+**That's it — delegation is now the default.** A SessionStart hook injects the
+orchestration rules and your worker inventory into every session, so Claude
+automatically routes well-specced implementation and token-hungry work to your
+workers and keeps judgment work on your premium model. (With no workers
+configured, the hook stays out of the way.)
+
+You can also delegate explicitly:
 
 ```
 /model-orchestration:delegate glm implement the pagination fix described in docs/plan.md
 ```
 
-The manager writes the spec, dispatches the worker, **audits the result**
+Either way, the manager writes the spec, dispatches the worker, **audits the result**
 against the acceptance criteria, sends it back with revision notes if it
 misses, and only escalates after a second miss. *Judge the output, not the
 price tag.*
@@ -47,7 +53,8 @@ price tag.*
 | `skills/orchestrating-model-workers/` | The knowledge: setup workflow, dispatch patterns, revision gate, and the non-obvious traps (env-var inheritance breaking auth, headless onboarding) |
 | `scripts/setup-worker.sh` | Generic worker manager: `create` / `set-key` / `finalize` / `list` / `remove` |
 | `commands/setup-worker.md` | `/model-orchestration:setup-worker` — guided setup |
-| `commands/delegate.md` | `/model-orchestration:delegate` — dispatch + audit loop |
+| `commands/delegate.md` | `/model-orchestration:delegate` — explicit dispatch + audit loop |
+| `hooks/session-start.sh` | Makes delegation the default: injects rules + worker inventory each session |
 | `skills/.../templates/delegation-rules.md` | Drop-in CLAUDE.md section to make delegation a standing behavior |
 
 ## Requirements
