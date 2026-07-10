@@ -19,6 +19,11 @@ Arguments given: "$ARGUMENTS"
 3. For each chosen provider, run:
    `"${CLAUDE_PLUGIN_ROOT}/scripts/setup-worker.sh" create <name> --provider <id>`
    Default the worker name to the preset id unless the user gave one.
+   **Ollama preset:** first check the server is up (`curl -s localhost:11434/api/version`)
+   and run `ollama list`, then ask the user which local model to map the tiers
+   to (offer instruct/tool-capable models; warn against `-mlx` variants — see
+   the skill's local-models caveats). Pass it via `--sonnet <model>` and set
+   the key yourself: `printf 'ollama' | setup-worker.sh set-key <name>`.
 4. Show the user where to get the key (the preset's key_url) and exactly how
    to add it (the two options the script printed). NEVER ask them to paste the
    key into chat; if they do anyway, use it but advise rotating it afterwards.

@@ -73,6 +73,38 @@ Return a one-paragraph summary with file paths, not full diffs." \
 - To install these rules permanently, append `templates/delegation-rules.md`
   (in this skill's directory) to the user's `~/.claude/CLAUDE.md`.
 
+## Local model workers (Ollama, llama.cpp, LM Studio)
+
+Ollama ≥ v0.14.0 ships a native Anthropic-compatible `/v1/messages` endpoint,
+so a local worker is just:
+
+```bash
+setup-worker.sh create local --provider ollama --sonnet qwen3-coder:30b
+printf 'ollama' | setup-worker.sh set-key local   # literal 'ollama' — required but ignored
+setup-worker.sh finalize local
+```
+
+Pick the model from `ollama list` — it must be instruct-tuned with tool
+calling to be useful as a coding worker. Verified caveats (live-tested 2026-07):
+
+- **MLX-variant models hang** on `/v1/messages` even though they work on the
+  OpenAI route — use GGUF variants behind the Anthropic endpoint.
+- **Older Ollama builds wedge under Claude Code**: it calls
+  `/v1/messages/count_tokens`, and versions that 404 it can become unresponsive
+  afterward (ollama/ollama#13949) — every later request hangs with 0 bytes.
+  Unwedge with `ollama stop <model>`; the real fix is upgrading Ollama.
+- If your Ollama can't be upgraded, front it with a LiteLLM proxy
+  (`litellm --model ollama/<model>`) and point the worker's `--base-url` at
+  the proxy — it translates the Anthropic API onto Ollama's OpenAI route.
+- Expectations: local 7–30B models trail flat-rate cloud workers badly on
+  agentic coding, and Claude Code's large system prompt makes laptop prefill
+  slow. Position local workers for privacy/offline needs and simple bulk
+  tasks, not as the primary implementer.
+
+Any other local runtime exposing an Anthropic-compatible endpoint (llama.cpp
+`llama-server`, LM Studio, an Olla/LiteLLM proxy) works the same way: point
+`--base-url` at it and map the tiers.
+
 ## Workers inside Workflows and subagents
 
 Workflow `agent()` calls and the Agent tool only accept Claude model tiers —

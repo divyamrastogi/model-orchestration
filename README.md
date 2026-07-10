@@ -62,6 +62,17 @@ price tag.*
 | `agents/worker-dispatch.md` | Bridge agent so Workflow scripts and the Agent tool can fan tasks out to workers (`agentType: 'model-orchestration:worker-dispatch'`) |
 | `skills/.../templates/delegation-rules.md` | Drop-in CLAUDE.md section to make delegation a standing behavior |
 
+## Local models
+
+Ollama (≥ v0.14.0) exposes a native Anthropic-compatible endpoint, so fully
+local workers work too: `ollama` is a built-in preset, and the setup command
+offers your locally pulled models as tier mappings (API key is the literal
+string `ollama`). llama.cpp's `llama-server`, LM Studio, and LiteLLM/Olla
+proxies plug in the same way via `--base-url`. See the skill's local-models
+section for verified caveats (MLX variants, older-Ollama `count_tokens` hangs)
+and realistic expectations — local workers suit privacy/offline and simple
+bulk tasks rather than primary implementation.
+
 ## Requirements
 
 - Claude Code ≥ 2.x with your normal Anthropic login (the manager)

@@ -28,6 +28,12 @@
       "key_url": "https://platform.minimax.io/user-center/basic-information/interface-key",
       "notes": ""
     },
+    "ollama": {
+      "label": "Ollama (local)",
+      "base_url": "http://localhost:11434",
+      "key_url": "",
+      "notes": "Key is the literal string 'ollama' (required but ignored). No default tier mappings — map --sonnet/--opus/--haiku to models from `ollama list` (instruct + tool-calling capable, GGUF variants). Requires an Ollama version with full Anthropic compatibility; see the skill's local-models section for verified caveats."
+    },
     "deepseek": {
       "label": "DeepSeek",
       "base_url": "https://api.deepseek.com/anthropic",
