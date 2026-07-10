@@ -88,6 +88,11 @@ bulk tasks rather than primary implementation.
 - Workers run with whatever `--permission-mode` you dispatch them with;
   default is Claude Code's normal prompting.
 
+## Privacy
+
+No telemetry, no analytics, no plugin-operated endpoints — keys and task
+content go only to the providers you configure. See [PRIVACY.md](PRIVACY.md).
+
 ## License
 
 MIT
