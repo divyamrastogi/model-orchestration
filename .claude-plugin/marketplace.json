@@ -1,5 +1,6 @@
 {
   "name": "model-orchestration",
+  "description": "Manager/worker orchestration for Claude Code: delegate implementation and token-hungry work to isolated headless workers backed by any Anthropic-compatible API.",
   "owner": {
     "name": "Divyam Rastogi"
   },
